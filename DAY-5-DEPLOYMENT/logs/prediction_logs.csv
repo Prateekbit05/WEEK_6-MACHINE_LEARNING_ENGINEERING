@@ -1,0 +1,1 @@
+request_id,timestamp,model_version,prediction,label,confidence,drift_warning,latency_ms
