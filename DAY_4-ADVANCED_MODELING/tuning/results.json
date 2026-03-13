@@ -1,0 +1,17 @@
+{
+    "baseline": {
+        "accuracy": 0.988775,
+        "f1": 0.9873346923391804
+    },
+    "tuned": {
+        "accuracy": 0.98665,
+        "f1": 0.984968640149946
+    },
+    "improvement_f1": -0.002366052189234358,
+    "best_params": {
+        "n_estimators": 292,
+        "max_depth": 20,
+        "min_samples_split": 8,
+        "min_samples_leaf": 2
+    }
+}
