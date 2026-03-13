@@ -1,1 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Week 6 — ML Engineering</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #11111a;
+    --border: #1e1e2e;
+    --accent: #00ff88;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card: #13131f;
+  }
 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 80px 0 60px;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,255,136,0.08);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 32px;
+    letter-spacing: 0.05em;
+  }
+
+  .hero-badge::before { content: '●'; animation: pulse 2s infinite; }
+
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+
+  h1 span.green { color: var(--accent); }
+  h1 span.purple { color: #a78bfa; }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin-bottom: 48px;
+    font-weight: 400;
+  }
+
+  /* Badges row */
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 60px;
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border: 1px solid;
+  }
+
+  .badge.python { background: rgba(55,118,171,0.15); border-color: rgba(55,118,171,0.4); color: #60a5fa; }
+  .badge.sklearn { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3); color: #fbbf24; }
+  .badge.fastapi { background: rgba(0,189,126,0.1); border-color: rgba(0,189,126,0.3); color: #34d399; }
+  .badge.docker  { background: rgba(36,150,237,0.1); border-color: rgba(36,150,237,0.3); color: #60a5fa; }
+  .badge.jupyter { background: rgba(242,121,55,0.1); border-color: rgba(242,121,55,0.3); color: #fb923c; }
+  .badge.streamlit { background: rgba(255,75,75,0.1); border-color: rgba(255,75,75,0.3); color: #f87171; }
+
+  /* ── STATS ROW ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 80px;
+  }
+
+  .stat {
+    background: var(--card);
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .stat-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 80px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(0,255,136,0.08);
+    border: 1px solid rgba(0,255,136,0.2);
+    padding: 4px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  /* ── DAYS GRID ── */
+  .days-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .day-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .day-card:hover { border-color: rgba(0,255,136,0.3); }
+  .day-card.active { border-color: var(--accent); }
+
+  .day-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 28px;
+  }
+
+  .day-num {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .day-1 .day-num { background: rgba(0,255,136,0.12); color: var(--accent); border: 1px solid rgba(0,255,136,0.25); }
+  .day-2 .day-num { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+  .day-3 .day-num { background: rgba(245,158,11,0.12); color: var(--accent3); border: 1px solid rgba(245,158,11,0.25); }
+  .day-4 .day-num { background: rgba(239,68,68,0.12); color: #f87171; border: 1px solid rgba(239,68,68,0.25); }
+  .day-5 .day-num { background: rgba(59,130,246,0.12); color: #60a5fa; border: 1px solid rgba(59,130,246,0.25); }
+
+  .day-title { font-size: 1.05rem; font-weight: 700; }
+  .day-subtitle { font-size: 0.82rem; color: var(--muted); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+
+  .day-toggle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: transform 0.3s, background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .day-card.active .day-toggle { transform: rotate(180deg); background: rgba(0,255,136,0.15); color: var(--accent); }
+
+  .day-body {
+    display: none;
+    padding: 0 28px 28px;
+    border-top: 1px solid var(--border);
+  }
+
+  .day-card.active .day-body { display: block; }
+
+  /* Deliverables */
+  .deliverables {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 10px;
+    margin: 20px 0;
+  }
+
+  .deliverable {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0,255,136,0.04);
+    border: 1px solid rgba(0,255,136,0.12);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  .deliverable::before { content: '✓'; font-size: 12px; }
+
+  /* Topics pills */
+  .topics { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0; }
+
+  .topic {
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* Results table */
+  .result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  .result-table th {
+    text-align: left;
+    padding: 10px 14px;
+    background: rgba(0,255,136,0.06);
+    color: var(--accent);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--muted);
+  }
+
+  .result-table tr:last-child td { border-bottom: none; }
+  .result-table .best td { color: var(--text); }
+  .result-table .best td:first-child::after { content: ' ✅'; }
+  .result-table .highlight { color: var(--accent) !important; font-weight: 700; }
+
+  .day-section-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 20px 0 10px;
+  }
+
+  /* ── METRICS GRID ── */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .metric-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .metric-name { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── PIPELINE ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 24px 0;
+    margin-bottom: 60px;
+  }
+
+  .pipe-step {
+    flex-shrink: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    text-align: center;
+    min-width: 140px;
+    position: relative;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  .pipe-step:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+  .pipe-icon { font-size: 1.5rem; margin-bottom: 8px; }
+  .pipe-day { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+  .pipe-name { font-size: 0.82rem; font-weight: 700; margin-top: 4px; }
+
+  .pipe-arrow {
+    color: var(--accent);
+    font-size: 1.2rem;
+    padding: 0 8px;
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
+  /* ── COMPLETION ── */
+  .completion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .completion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+
+  .completion-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0,255,136,0.12);
+    border: 1px solid rgba(0,255,136,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .completion-text { font-size: 0.88rem; color: var(--text); }
+  .completion-sub { font-size: 0.78rem; color: var(--muted); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  footer span { color: var(--accent); }
+
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .completion-grid { grid-template-columns: 1fr; }
+    .pipeline { gap: 4px; }
+    .pipe-step { min-width: 110px; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">HESTABIT TECHNOLOGIES · ML ENGINEERING INTERNSHIP</div>
+    <h1>Week <span class="green">6</span> —<br/><span class="purple">Machine Learning</span><br/>Engineering</h1>
+    <p class="hero-sub">Data → Features → Models → Tuning → Deployment → Monitoring</p>
+
+    <div class="badges">
+      <div class="badge python">🐍 Python 3.12</div>
+      <div class="badge sklearn">⚙️ Scikit-Learn</div>
+      <div class="badge fastapi">⚡ FastAPI</div>
+      <div class="badge docker">🐳 Docker</div>
+      <div class="badge jupyter">📓 Jupyter</div>
+      <div class="badge streamlit">📊 Streamlit</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Days Completed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">100K</div>
+      <div class="stat-label">Records Processed</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">20</div>
+      <div class="stat-label">Attack Classes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">98.6%</div>
+      <div class="stat-label">Model Accuracy</div>
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">PIPELINE</div>
+      <h2>End-to-End ML Flow</h2>
+    </div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-icon">📥</div>
+        <div class="pipe-day">DAY 1</div>
+        <div class="pipe-name">Data Pipeline + EDA</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🔧</div>
+        <div class="pipe-day">DAY 2</div>
+        <div class="pipe-name">Feature Engineering</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🤖</div>
+        <div class="pipe-day">DAY 3</div>
+        <div class="pipe-name">Model Training</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🔬</div>
+        <div class="pipe-day">DAY 4</div>
+        <div class="pipe-name">Tuning + SHAP</div>
+      </div>
+      <div class="pipe-arrow">→</div>
+      <div class="pipe-step">
+        <div class="pipe-icon">🚀</div>
+        <div class="pipe-day">DAY 5</div>
+        <div class="pipe-name">Deploy + Monitor</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAYS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">DAYS</div>
+      <h2>Day-wise Implementation</h2>
+    </div>
+
+    <div class="days-grid">
+
+      <!-- DAY 1 -->
+      <div class="day-card day-1 active" onclick="toggle(this)">
+        <div class="day-header">
+          <div class="day-num">D01</div>
+          <div>
+            <div class="day-title">Data Pipeline + EDA + Project Architecture</div>
+            <div class="day-subtitle">NF-UQ-NIDS-v2 · 100K rows · 46 features · 20 classes</div>
+          </div>
+          <div class="day-toggle">▼</div>
+        </div>
+        <div class="day-body">
+          <p class="day-section-label">Topics Covered</p>
+          <div class="topics">
+            <span class="topic">Chunked Loading</span>
+            <span class="topic">Missing Value Imputation</span>
+            <span class="topic">IQR Outlier Capping</span>
+            <span class="topic">StandardScaler</span>
+            <span class="topic">SMOTE</span>
+            <span class="topic">Dataset Versioning</span>
+            <span class="topic">Stratified Split</span>
+            <span class="topic">Correlation Matrix</span>
+          </div>
+
+          <p class="day-section-label">Dataset Summary</p>
+          <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-val">100K</div><div class="metric-name">Working Sample</div></div>
+            <div class="metric-card"><div class="metric-val">46</div><div class="metric-name">Total Features</div></div>
+            <div class="metric-card"><div class="metric-val">20</div><div class="metric-name">Attack Classes</div></div>
+            <div class="metric-card"><div class="metric-val">0</div><div class="metric-name">Missing Values</div></div>
+            <div class="metric-card"><div class="metric-val">32,986:1</div><div class="metric-name">Imbalance Ratio</div></div>
+            <div class="metric-card"><div class="metric-val">0</div><div class="metric-name">Duplicate Rows</div></div>
+          </div>
+
+          <p class="day-section-label">Deliverables</p>
+          <div class="deliverables">
+            <div class="deliverable">data_pipeline.py</div>
+            <div class="deliverable">EDA.ipynb</div>
+            <div class="deliverable">final.csv</div>
+            <div class="deliverable">DATA-REPORT.md</div>
+          </div>
+
+          <p class="day-section-label">Key Design Decisions</p>
+          <div class="topics">
+            <span class="topic">Chunked loading (50K rows/chunk) for RAM efficiency</span>
+            <span class="topic">SMOTE on training data only — no leakage</span>
+            <span class="topic">IQR capping preserves volume vs deletion</span>
+            <span class="topic">Dataframe hashing for lightweight versioning</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 2 -->
+      <div class="day-card day-2" onclick="toggle(this)">
+        <div class="day-header">
+          <div class="day-num">D02</div>
+          <div>
+            <div class="day-title">Feature Engineering + Feature Selection</div>
+            <div class="day-subtitle">42 → 144 engineered → 50 selected features</div>
+          </div>
+          <div class="day-toggle">▼</div>
+        </div>
+        <div class="day-body">
+          <p class="day-section-label">Topics Covered</p>
+          <div class="topics">
+            <span class="topic">Log / Sqrt / Power Transforms</span>
+            <span class="topic">Interaction Features</span>
+            <span class="topic">Ratio Features</span>
+            <span class="topic">Binning</span>
+            <span class="topic">Aggregation</span>
+            <span class="topic">Mutual Information</span>
+            <span class="topic">RFE</span>
+            <span class="topic">Ensemble Voting</span>
+          </div>
+
+          <p class="day-section-label">Engineering Pipeline Results</p>
+          <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-val">42</div><div class="metric-name">Input Features</div></div>
+            <div class="metric-card"><div class="metric-val">144</div><div class="metric-name">After Engineering</div></div>
+            <div class="metric-card"><div class="metric-val">50</div><div class="metric-name">Final Selected</div></div>
+            <div class="metric-card"><div class="metric-val">102</div><div class="metric-name">New Features Created</div></div>
+            <div class="metric-card"><div class="metric-val">6</div><div class="metric-name">Selection Methods</div></div>
+            <div class="metric-card"><div class="metric-val">≥2</div><div class="metric-name">Votes to Select</div></div>
+          </div>
+
+          <p class="day-section-label">Top Features by Mutual Information</p>
+          <table class="result-table">
+            <tr><th>Feature</th><th>MI Score</th><th>Why It Matters</th></tr>
+            <tr><td>OUT_BYTES_binned</td><td class="highlight">0.0372</td><td>Captures traffic volume categories</td></tr>
+            <tr><td>L4_SRC_PORT_x_PROTOCOL</td><td class="highlight">0.0365</td><td>Flags unusual port-protocol combos</td></tr>
+            <tr><td>OUT_PKTS_binned</td><td class="highlight">0.0366</td><td>Distinguishes DDoS vs normal flows</td></tr>
+            <tr><td>L4_SRC_PORT_log</td><td class="highlight">0.0347</td><td>Compresses high ephemeral port range</td></tr>
+            <tr><td>agg_sum</td><td class="highlight">0.0335</td><td>Captures overall flow intensity</td></tr>
+          </table>
+
+          <p class="day-section-label">Deliverables</p>
+          <div class="deliverables">
+            <div class="deliverable">build_features.py</div>
+            <div class="deliverable">feature_selector.py</div>
+            <div class="deliverable">feature_list.json</div>
+            <div class="deliverable">FEATURE-ENGINEERING-DOC.md</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 3 -->
+      <div class="day-card day-3" onclick="toggle(this)">
+        <div class="day-header">
+          <div class="day-num">D03</div>
+          <div>
+            <div class="day-title">Model Building + Advanced Training Pipeline</div>
+            <div class="day-subtitle">5 models · 5-fold CV · Auto best model selection</div>
+          </div>
+          <div class="day-toggle">▼</div>
+        </div>
+        <div class="day-body">
+          <p class="day-section-label">Topics Covered</p>
+          <div class="topics">
+            <span class="topic">Logistic Regression</span>
+            <span class="topic">Random Forest</span>
+            <span class="topic">XGBoost</span>
+            <span class="topic">LightGBM</span>
+            <span class="topic">Neural Network (MLP)</span>
+            <span class="topic">5-Fold Stratified CV</span>
+            <span class="topic">L1 / L2 Regularization</span>
+            <span class="topic">ROC-AUC (OvR)</span>
+          </div>
+
+          <p class="day-section-label">Cross-Validation Results (5-Fold)</p>
+          <table class="result-table">
+            <tr><th>Model</th><th>CV Accuracy</th><th>CV F1</th><th>ROC-AUC</th><th>Time</th></tr>
+            <tr><td>Logistic Regression</td><td>0.0073</td><td>0.0105</td><td>0.4996</td><td>159.6s</td></tr>
+            <tr><td>Random Forest</td><td>0.1420</td><td>0.1784</td><td>0.5000</td><td>21.4s</td></tr>
+            <tr><td>Neural Network</td><td>0.3285</td><td>0.1779</td><td>0.4991</td><td>34.8s</td></tr>
+            <tr><td>XGBoost</td><td>0.3190</td><td>0.2262</td><td>0.5004</td><td>88.7s</td></tr>
+            <tr class="best"><td>LightGBM</td><td>0.3172</td><td class="highlight">0.2343</td><td>0.4993</td><td>85.8s</td></tr>
+          </table>
+
+          <p class="day-section-label">Deliverables</p>
+          <div class="deliverables">
+            <div class="deliverable">train.py</div>
+            <div class="deliverable">best_model.pkl</div>
+            <div class="deliverable">metrics.json</div>
+            <div class="deliverable">MODEL-COMPARISON.md</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 4 -->
+      <div class="day-card day-4" onclick="toggle(this)">
+        <div class="day-header">
+          <div class="day-num">D04</div>
+          <div>
+            <div class="day-title">Hyperparameter Tuning + Explainability + Error Analysis</div>
+            <div class="day-subtitle">Optuna · SHAP TreeExplainer · 98.6% accuracy</div>
+          </div>
+          <div class="day-toggle">▼</div>
+        </div>
+        <div class="day-body">
+          <p class="day-section-label">Topics Covered</p>
+          <div class="topics">
+            <span class="topic">Optuna TPE Sampler</span>
+            <span class="topic">GridSearchCV</span>
+            <span class="topic">RandomizedSearchCV</span>
+            <span class="topic">SHAP TreeExplainer</span>
+            <span class="topic">Feature Importance</span>
+            <span class="topic">Error Clustering</span>
+            <span class="topic">Bias / Variance Analysis</span>
+            <span class="topic">SMOTE</span>
+          </div>
+
+          <p class="day-section-label">Tuning Results</p>
+          <table class="result-table">
+            <tr><th>Stage</th><th>Accuracy</th><th>F1 (Macro)</th></tr>
+            <tr><td>Baseline (Day 3)</td><td>0.9888</td><td>0.9873</td></tr>
+            <tr class="best"><td>Tuned (Optuna 30 trials)</td><td>0.9867</td><td class="highlight">0.9850</td></tr>
+          </table>
+
+          <p class="day-section-label">Best Hyperparameters (Random Forest)</p>
+          <table class="result-table">
+            <tr><th>Parameter</th><th>Value</th></tr>
+            <tr><td>n_estimators</td><td class="highlight">292</td></tr>
+            <tr><td>max_depth</td><td class="highlight">20</td></tr>
+            <tr><td>min_samples_split</td><td class="highlight">8</td></tr>
+            <tr><td>min_samples_leaf</td><td class="highlight">2</td></tr>
+          </table>
+
+          <p class="day-section-label">Deliverables</p>
+          <div class="deliverables">
+            <div class="deliverable">tuning.py</div>
+            <div class="deliverable">shap_analysis.py</div>
+            <div class="deliverable">results.json</div>
+            <div class="deliverable">MODEL-INTERPRETATION.md</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DAY 5 -->
+      <div class="day-card day-5" onclick="toggle(this)">
+        <div class="day-header">
+          <div class="day-num">D05</div>
+          <div>
+            <div class="day-title">Model Deployment + Monitoring + MLOps Capstone</div>
+            <div class="day-subtitle">FastAPI · Drift Detection · Streamlit · Docker</div>
+          </div>
+          <div class="day-toggle">▼</div>
+        </div>
+        <div class="day-body">
+          <p class="day-section-label">Topics Covered</p>
+          <div class="topics">
+            <span class="topic">FastAPI</span>
+            <span class="topic">Pydantic Validation</span>
+            <span class="topic">Request ID Tracking</span>
+            <span class="topic">Versioned Model Loading</span>
+            <span class="topic">KS-Test Drift Detection</span>
+            <span class="topic">PSI Drift Detection</span>
+            <span class="topic">Prediction Logging</span>
+            <span class="topic">Streamlit Dashboard</span>
+            <span class="topic">Docker</span>
+            <span class="topic">docker-compose</span>
+          </div>
+
+          <p class="day-section-label">API Endpoints</p>
+          <table class="result-table">
+            <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+            <tr><td>GET</td><td>/health</td><td>Model status + uptime</td></tr>
+            <tr><td>GET</td><td>/metrics</td><td>Latency P95, drift count</td></tr>
+            <tr><td>GET</td><td>/model/info</td><td>Version, features, labels</td></tr>
+            <tr><td>POST</td><td>/predict</td><td>Single prediction + drift check</td></tr>
+            <tr><td>POST</td><td>/predict/batch</td><td>Batch (up to 1000 samples)</td></tr>
+            <tr><td>POST</td><td>/model/reload</td><td>Hot reload from disk</td></tr>
+          </table>
+
+          <p class="day-section-label">Monitoring Alerts</p>
+          <table class="result-table">
+            <tr><th>Alert</th><th>Method</th><th>Threshold</th></tr>
+            <tr><td>Covariate Drift</td><td>PSI per feature</td><td>PSI ≥ 0.2 = HIGH</td></tr>
+            <tr><td>Distribution Shift</td><td>KS-test</td><td>p-value &lt; 0.05</td></tr>
+            <tr><td>Confidence Drop</td><td>Rolling window</td><td>Drop &gt; 0.10</td></tr>
+            <tr><td>Latency Spike</td><td>Rolling window</td><td>Current &gt; 2× prev</td></tr>
+            <tr><td>Attack Surge</td><td>Label distribution</td><td>Attack ratio &gt; 50%</td></tr>
+          </table>
+
+          <p class="day-section-label">Deliverables</p>
+          <div class="deliverables">
+            <div class="deliverable">api.py</div>
+            <div class="deliverable">Dockerfile</div>
+            <div class="deliverable">drift_checker.py</div>
+            <div class="deliverable">prediction_logs.csv</div>
+            <div class="deliverable">DEPLOYMENT-NOTES.md</div>
+            <div class="deliverable">dashboard.py</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- COMPLETION -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">OUTCOMES</div>
+      <h2>Week 6 Completion Checklist</h2>
+    </div>
+    <div class="completion-grid">
+      <div class="completion-item">
+        <div class="completion-check">✓</div>
+        <div>
+          <div class="completion-text">Clean versioned dataset produced</div>
+          <div class="completion-sub">100K rows · 0 missing · 0 duplicates</div>
+        </div>
+      </div>
+      <div class="completion-item">
+        <div class="completion-check">✓</div>
+        <div>
+          <div class="completion-text">102 new features engineered, 50 selected</div>
+          <div class="completion-sub">6-method ensemble voting</div>
+        </div>
+      </div>
+      <div class="completion-item">
+        <div class="completion-check">✓</div>
+        <div>
+          <div class="completion-text">5 models trained with 5-fold CV</div>
+          <div class="completion-sub">LightGBM best at CV F1: 0.2343</div>
+        </div>
+      </div>
+      <div class="completion-item">
+        <div class="completion-check">✓</div>
+        <div>
+          <div class="completion-text">Optuna tuning — 30 trials</div>
+          <div class="completion-sub">Random Forest · 98.67% accuracy</div>
+        </div>
+      </div>
+      <div class="completion-item">
+        <div class="completion-check">✓</div>
+        <div>
+          <div class="completion-text">SHAP explainability added</div>
+          <div class="completion-sub">TreeExplainer · Top-10 feature importance</div>
+        </div>
+      </div>
+      <div class="completion-item">
+        <div class="completion-check">✓</div>
+        <div>
+          <div class="completion-text">FastAPI deployed — 6 endpoints</div>
+          <div class="completion-sub">UUID tracking · Pydantic validation</div>
+        </div>
+      </div>
+      <div class="completion-item">
+        <div class="completion-check">✓</div>
+        <div>
+          <div class="completion-text">KS-test + PSI drift monitoring</div>
+          <div class="completion-sub">20 features · 3 severity levels</div>
+        </div>
+      </div>
+      <div class="completion-item">
+        <div class="completion-check">✓</div>
+        <div>
+          <div class="completion-text">Dockerized + Streamlit dashboard</div>
+          <div class="completion-sub">docker-compose · live prediction test UI</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="container">
+    <span>Prateek</span> · Hestabit Technologies · Week 6 ML Engineering ·
+    Dataset: <span>NF-UQ-NIDS-v2</span>
+  </div>
+</footer>
+
+<script>
+  function toggle(card) {
+    card.classList.toggle('active');
+  }
+</script>
+
+</body>
+</html>
