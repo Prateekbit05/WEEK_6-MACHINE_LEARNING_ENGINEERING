@@ -1,0 +1,84 @@
+{
+    "best_model": "LightGBM",
+    "cv_results": {
+        "Logistic Regression": {
+            "model_name": "Logistic Regression",
+            "accuracy_mean": 0.007275621934771973,
+            "accuracy_std": 0.0006416771567207617,
+            "precision_mean": 0.261078864882751,
+            "precision_std": 0.038677286006314565,
+            "recall_mean": 0.007275621934771973,
+            "recall_std": 0.0006416771567207617,
+            "f1_mean": 0.010527444376577533,
+            "f1_std": 0.001185309524267627,
+            "roc_auc_mean": 0.4996352305148898,
+            "roc_auc_std": 0.0008711344844910063,
+            "training_time": 159.56766891479492
+        },
+        "Random Forest": {
+            "model_name": "Random Forest",
+            "accuracy_mean": 0.14202492543895007,
+            "accuracy_std": 0.0021577331926780708,
+            "precision_mean": 0.25109002547665804,
+            "precision_std": 0.0026125555250483454,
+            "recall_mean": 0.14202492543895007,
+            "recall_std": 0.0021577331926780708,
+            "f1_mean": 0.17838010725708572,
+            "f1_std": 0.0023271933448572855,
+            "roc_auc_mean": 0.5000074749266361,
+            "roc_auc_std": 0.0011609533215635546,
+            "training_time": 21.448350429534912
+        },
+        "XGBoost": {
+            "model_name": "XGBoost",
+            "accuracy_mean": 0.31897796837705533,
+            "accuracy_std": 0.002452874058482077,
+            "precision_mean": 0.2527673034383826,
+            "precision_std": 0.016817489434062964,
+            "recall_mean": 0.31897796837705533,
+            "recall_std": 0.002452874058482077,
+            "f1_mean": 0.22624394651418472,
+            "f1_std": 0.002287127981778442,
+            "roc_auc_mean": 0.5003804858109654,
+            "roc_auc_std": 0.0029141231564512086,
+            "training_time": 88.70269179344177
+        },
+        "LightGBM": {
+            "model_name": "LightGBM",
+            "accuracy_mean": 0.31719028398144744,
+            "accuracy_std": 0.002101031333496017,
+            "precision_mean": 0.25543347310081826,
+            "precision_std": 0.008316402088384344,
+            "recall_mean": 0.31719028398144744,
+            "recall_std": 0.002101031333496017,
+            "f1_mean": 0.23430630793241164,
+            "f1_std": 0.0026556075816164524,
+            "roc_auc_mean": 0.49925149441387007,
+            "roc_auc_std": 0.002013233298192276,
+            "training_time": 85.82479667663574
+        },
+        "Neural Network": {
+            "model_name": "Neural Network",
+            "accuracy_mean": 0.3284912434480587,
+            "accuracy_std": 0.001359565141989323,
+            "precision_mean": 0.2384963290667578,
+            "precision_std": 0.02230611549812253,
+            "recall_mean": 0.3284912434480587,
+            "recall_std": 0.001359565141989323,
+            "f1_mean": 0.17789721841495232,
+            "f1_std": 0.009233894344580367,
+            "roc_auc_mean": 0.49910509427161076,
+            "roc_auc_std": 0.0024992008874312535,
+            "training_time": 34.813944578170776
+        }
+    },
+    "test_metrics": {
+        "accuracy": 0.32571628581429074,
+        "precision": 0.22913470537628006,
+        "recall": 0.32571628581429074,
+        "f1_score": 0.183456970697907,
+        "roc_auc": 0.5001814186532847
+    },
+    "n_classes": 16,
+    "timestamp": "2026-03-12T18:41:25.433361"
+}
